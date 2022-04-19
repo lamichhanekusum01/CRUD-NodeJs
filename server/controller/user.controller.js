@@ -1,15 +1,16 @@
 import UserModel from "../models/use.model.js";
 import mongoose from "mongoose";
+
+const { find, findOne } = mongoose;
 export async function createOneRequest(req, res) {
   // req.body is for POST requests. Think 'body of the postman'
   // destruct the name value from the request body
-  const { rank, country, name } = req.body;
-  const { find, findOne } = mongoose;
+ 
 //   console.log(req.body);
-
-  // check if database already contains this name
+const { rank, country, name } = req.body;
+  // check if database already contains this name rank and country
   try {
-    const foundUser = await find({rank});
+    const foundUser = await UserModel.find({rank});
     console.log(foundUser);
 
     // if no user is found, we can add this user to the database.
@@ -31,28 +32,50 @@ export async function readOneRequest(req, res) {
   // parameters.
 
   // attempt to retrieve user
-  const foundUser = await findOne(req.params.id);
+  try{
+    const foundUser = await UserModel.findOne({_id:req.params.id});
+    if (!foundUser || foundUser.length == 0) {
+      throw new Error("err")
+    }
+    res.status(302).json({
+      success:true,
+      message: foundUser
+    });
 
-  // return 404 if no user found, return user otherwise.
-  if (!foundUser || foundUser.length == 0) {
-    res.status(404).json({ message: "User not found!" });
-  } else {
-    res.status(302).json(foundUser);
+  }catch(err){
+    res.status(400).json({
+      success:false,
+      message:"user not found"
+    })
   }
+  
 }
 export async function updateOneRequest(req, res) {
   const { id } = req.body;
-  const foundUser = await findOne({ _id: id });
-  if (foundUser || foundUser.length == 0) {
-    const response = await foundUser.updateOne({ _id: id });
-    res.status(301).json(response);
-  } else {
-    res.status(404).json({ message: `User not found...` });
+try{
+  const foundUser = await UserModel.findOne({_id:req.params.id});
+  if(!foundUser){
+    throw new Error("err")
   }
+  if (foundUser || foundUser.length == 0) {
+    const response = await foundUser.updateOne({ 
+      name:req.body.name
+     });
+     res.status(301).json({
+      success: true,
+      message:"user update successfully"
+    });
+    }
+ 
+    
+    
+}catch(err){
+  res.status(404).json({ message: `User not found...` });
+}
 }
 export async function deleteOneRequest(req, res) {
   const { id } = req.params;
-  const foundUser = await findOne({ _id: id });
+  const foundUser = await UserModel.findOne({ _id: id });
   if (foundUser || foundUser.length == 0) {
     const response = await foundUser.deleteOne({ _id: id });
     res.status(202).json(response);
