@@ -1,10 +1,12 @@
 import express, { json } from "express";
 import userRouter from "./routes/user.routes.js";
+import dotenv from "dotenv";
+dotenv.config()
+import mongoose from "mongoose";
+
 
 const app = express();
-import { config } from "dotenv";
-import mongoose from "mongoose";
-config();
+
 // Database connect
 mongoose.connect(
   process.env.CONN_URI,
