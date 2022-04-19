@@ -19,6 +19,7 @@ const UserModel = new mongoose.model('Name',
             {
                 type:String,
                 required:true,
+                unique:true
             }
         },
         {timestamps: true}
