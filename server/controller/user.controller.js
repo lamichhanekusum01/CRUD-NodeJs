@@ -50,6 +50,29 @@ export async function readOneRequest(req, res) {
   }
   
 }
+export async function readAllRequest(req, res) {
+  // Best request is GET, we can get the ID from the request
+  // parameters.
+
+  // attempt to retrieve user
+  try{
+    const foundUser = await UserModel.find({});
+    if (!foundUser || foundUser.length == 0) {
+      throw new Error("err")
+    }
+    res.status(302).json({
+      success:true,
+      message: foundUser
+    });
+
+  }catch(err){
+    res.status(400).json({
+      success:false,
+      message:"user not found"
+    })
+  }
+  
+}
 export async function updateOneRequest(req, res) {
   const { id } = req.body;
 try{
